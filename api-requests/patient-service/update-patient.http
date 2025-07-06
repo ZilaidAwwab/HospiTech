@@ -1,0 +1,15 @@
+### UPDATE existing patient's data
+PUT http://localhost:4000/patients/223e4567-e89b-12d3-a456-426614174014
+Content-Type: application/json
+
+{
+  "name": "Isabella Walker Pal",
+  "email": "isabella.walker@example.com",
+  "address": "789 Willow St, Springfield",
+  "dateOfBirth": "1987-10-17"
+}
+
+### The registered date once created is then not updated, that's why not added in updated
+
+### Now the DTO we had, has the field that requires registered date as well. So, for that
+### we added the a class CreatePatientValidationGroup in validators package in DTO class

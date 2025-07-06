@@ -1,0 +1,4 @@
+### DELETE patient's data
+DELETE localhost:4000/patients/223e4567-e89b-12d3-a456-426614174013
+
+### 204 Response Code with No Response in Body is the right outcome from this request
