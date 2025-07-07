@@ -1,0 +1,18 @@
+# Here we specified BillingService because that's the service name in our proto file,
+# and CreateBillingAccount is the RPC method that we are going to call
+# The request below has 3 parts which indicates,
+# 1. Address of the server
+# 2. Name of the service
+# 3. Name of the RPC method
+GRPC localhost:9001/BillingService/CreateBillingAccount
+# This above service and method are defined in the proto file
+
+# Now we have to send the protobuf message that we want to send with this request
+# In the proto file we can see that the message required is the BillingRequest message
+# that should have the properties defined in the proto file
+# This is similar to the REST request that we had been making
+{
+  "patientId": "12121",
+  "name": "John Doe",
+  "email": "john.doe@example.com"
+}
