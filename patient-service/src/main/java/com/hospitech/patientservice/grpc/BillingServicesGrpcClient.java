@@ -43,7 +43,7 @@ public class BillingServicesGrpcClient {
         blockingStub = BillingServiceGrpc.newBlockingStub(channel);
     }
 
-    public BillingResponse createBillingAccount(String patientId, String name, String email) {
+    public void createBillingAccount(String patientId, String name, String email) {
         BillingRequest request = BillingRequest.newBuilder()
                 .setPatientId(patientId).setName(name).setEmail(email).build();
 
@@ -51,6 +51,5 @@ public class BillingServicesGrpcClient {
         BillingResponse response = blockingStub.createBillingAccount(request);
 
         log.info("Received response from billing service via gRPC: {}", response);
-        return response;
     }
 }

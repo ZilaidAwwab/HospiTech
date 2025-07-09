@@ -4,6 +4,7 @@ import com.hospitech.patientservice.exception.EmailAlreadyExistsException;
 import com.hospitech.patientservice.dto.PatientRequestDTO;
 import com.hospitech.patientservice.dto.PatientResponseDTO;
 import com.hospitech.patientservice.exception.PatientNotFoundException;
+import com.hospitech.patientservice.grpc.BillingServicesGrpcClient;
 import com.hospitech.patientservice.mapper.PatientMapper;
 import com.hospitech.patientservice.model.Patient;
 import com.hospitech.patientservice.repository.PatientRepository;
@@ -16,10 +17,17 @@ import java.util.UUID;
 @Service
 public class PatientService {
 
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
 
-    public PatientService(PatientRepository patientRepository) {
+    // Injecting dependency for gRPC client, utilizing the Billing services via gRPC
+    private final BillingServicesGrpcClient billingServicesGrpcClient;
+
+    public PatientService(
+            PatientRepository patientRepository,
+            BillingServicesGrpcClient billingServicesGrpcClient
+    ) {
         this.patientRepository = patientRepository;
+        this.billingServicesGrpcClient = billingServicesGrpcClient;
     }
 
     // *** Get all patients data ***
@@ -47,6 +55,11 @@ public class PatientService {
 
         Patient newPatient = patientRepository.save(
                 PatientMapper.toModel(patientRequestDTO));
+
+        // utilizing the billing service via gRPC client
+        billingServicesGrpcClient.createBillingAccount(
+                newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
+
         return PatientMapper.toDTO(newPatient);
     }
 
