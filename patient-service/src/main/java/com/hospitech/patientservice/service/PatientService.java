@@ -5,6 +5,7 @@ import com.hospitech.patientservice.dto.PatientRequestDTO;
 import com.hospitech.patientservice.dto.PatientResponseDTO;
 import com.hospitech.patientservice.exception.PatientNotFoundException;
 import com.hospitech.patientservice.grpc.BillingServicesGrpcClient;
+import com.hospitech.patientservice.kafka.KafkaProducer;
 import com.hospitech.patientservice.mapper.PatientMapper;
 import com.hospitech.patientservice.model.Patient;
 import com.hospitech.patientservice.repository.PatientRepository;
@@ -21,13 +22,15 @@ public class PatientService {
 
     // Injecting dependency for gRPC client, utilizing the Billing services via gRPC
     private final BillingServicesGrpcClient billingServicesGrpcClient;
+    private final KafkaProducer kafkaProducer;
 
     public PatientService(
             PatientRepository patientRepository,
-            BillingServicesGrpcClient billingServicesGrpcClient
-    ) {
+            BillingServicesGrpcClient billingServicesGrpcClient,
+            KafkaProducer kafkaProducer) {
         this.patientRepository = patientRepository;
         this.billingServicesGrpcClient = billingServicesGrpcClient;
+        this.kafkaProducer = kafkaProducer;
     }
 
     // *** Get all patients data ***
@@ -56,9 +59,14 @@ public class PatientService {
         Patient newPatient = patientRepository.save(
                 PatientMapper.toModel(patientRequestDTO));
 
-        // utilizing the billing service via gRPC client
+        // Utilizing the billing service via gRPC client
+        // Making gRPC request to the billing service in order to create a billing account
+        // for this new patient
         billingServicesGrpcClient.createBillingAccount(
                 newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
+
+        // Sending patient created event to the kafka topic "patient"
+        kafkaProducer.sendEvent(newPatient);
 
         return PatientMapper.toDTO(newPatient);
     }

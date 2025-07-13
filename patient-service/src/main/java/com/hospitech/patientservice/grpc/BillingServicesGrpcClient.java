@@ -31,7 +31,7 @@ public class BillingServicesGrpcClient {
     // localhost:9001/BillingService/CreatePatientAccount (In local Environment)
     // aws.grpc:23221/BillingService/CreatePatientAccount (In production Environment)
     public BillingServicesGrpcClient(
-            @Value("${billing.service.address.localhost}") String serverAddress,
+            @Value("${billing.service.address:localhost}") String serverAddress,
             @Value("${billing.service.grpc.port:9001}") int serverPort
     ) {
         // This is just for indication

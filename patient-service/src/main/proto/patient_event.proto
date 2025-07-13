@@ -1,0 +1,25 @@
+// In this file we are going to define all the properties that will be sent by any given patient
+// event to the topic by kafka producer
+
+syntax = "proto3";
+
+package patient.events;
+
+// The option is added to our patient event proto file to tell the maven plugin that we
+// want to generate individual files for each of the different classes that it can create
+option java_multiple_files = true;
+
+// Events and Messages are interchangeable in this case, but this is the data (event/message)
+// that will be sent to the topic
+message PatientEvent {
+  string patientId = 1;
+  string name = 2;
+  string email = 3;
+  string event_type = 4;
+}
+
+// After writing this we will compile the service to produce the classes that we are going to use
+// when sending data to the topic
+
+// And then we are going to use this in the kafka producer class to sent the events composed of
+// this data fields
