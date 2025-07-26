@@ -1,0 +1,32 @@
+server:
+  port: 4004
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: patient-service-route
+          uri: http://patient-service:4000 # Here we are specifying on which route to send the requests of patient-service
+          predicates: # Predicate is what we use to determine what requests get sent to our patient-service
+            - Path=/api/patients/**
+          filters: # In filter, we re-write the predicates before it sends forward requests to patient-service
+            - StripPrefix=1 # This means that strip out the first part of the uri and send forward the remaining (Here /api/patient-service would be cutted down to "patient-service" stripping away /api)
+
+              # Every request API will land first in the API gateway, so, if this REST API lands in our API gateway
+              # http://localhost:4004/api/patients
+              # Now the API in the light of these above listed rules will think what to do with this request
+              # And so the landed API will be transformed to the following request according to the rules
+              # http://patient-service:4000/patients # The patient-service is spevified 4000 port by us
+
+        - id: api-docs-patient-route
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/api-docs/patients
+          filters:
+            - RewritePath=/api-docs/patients, /v3/api-docs # The first will be rewritten to the second and will be forwarded to the patient-service
+
+              # REST-CLIENT -> http://localhost:4004/api-docs/patients
+              # API-GATEWAY -> http://patient-service:4000/v3/api-docs
+
+# Since we have only one main producer service in this app, and other will listen to data coming
+# from that via gRPC or kafka messages, so only one app path is defined here
